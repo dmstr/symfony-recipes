@@ -1,0 +1,56 @@
+# file generated with AI assistance: Claude Code - 2026-07-01 17:10:01 UTC
+# ZA7 feature: Flowable REST engine (BPMN) + its own PostgreSQL.
+# Delivered by the dmstr/flowable-bundle recipe (copy-from-recipe). Picked up by
+# the A0 Makefile COMPOSE_FILE glob (docker/docker-compose.*.yml).
+#
+# The app talks to the engine container-to-container at
+#   http://flowable-rest:8080/flowable-rest
+# (server-to-server through the pass-through bundle; no CORS needed).
+# The host port below is only for local inspection / smoke tests.
+
+services:
+  flowable-rest:
+    image: flowable/flowable-rest:7.2.0
+    restart: unless-stopped
+    depends_on:
+      flowable-db:
+        condition: service_healthy
+    ports:
+      - "14408:8080"
+    environment:
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_DATASOURCE_URL: jdbc:postgresql://flowable-db:5432/flowable
+      SPRING_DATASOURCE_USERNAME: flowable
+      SPRING_DATASOURCE_PASSWORD: flowable_secret
+      FLOWABLE_REST_APP_ADMIN_USER_ID: ${FLOWABLE_REST_ADMIN_USER:-rest-admin}
+      FLOWABLE_REST_APP_ADMIN_PASSWORD: ${FLOWABLE_REST_ADMIN_PASSWORD:-test}
+      FLOWABLE_REST_APP_ADMIN_FIRST_NAME: Rest
+      FLOWABLE_REST_APP_ADMIN_LAST_NAME: Admin
+    healthcheck:
+      # The image ships only busybox wget (no bash/curl), and the actuator is
+      # auth-secured → a 401 still proves the REST server accepts connections.
+      # Any HTTP status line on stderr means "up"; connection-refused prints none.
+      test: ["CMD-SHELL", "wget -S -q -O /dev/null --timeout=5 http://localhost:8080/flowable-rest/actuator/health 2>&1 | grep -q 'HTTP/'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  flowable-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: flowable
+      POSTGRES_USER: flowable
+      POSTGRES_PASSWORD: flowable_secret
+    volumes:
+      - flowable-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flowable -d flowable"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+volumes:
+  flowable-data:

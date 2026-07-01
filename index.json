@@ -1,0 +1,15 @@
+{
+    "recipes": {
+        "dmstr/flowable-bundle": [
+            "0.1"
+        ]
+    },
+    "branch": "flex/main",
+    "is_contrib": true,
+    "_links": {
+        "repository": "github.com/dmstr/symfony-recipes",
+        "origin_template": "{package}:{version}@github.com/dmstr/symfony-recipes:flex/main",
+        "recipe_template": "https://raw.githubusercontent.com/dmstr/symfony-recipes/flex/main/{package_dotted}.{version}.json",
+        "archived_recipes_template": "https://raw.githubusercontent.com/dmstr/symfony-recipes/flex/main/archived/{package_dotted}/{version}.{ref}.json"
+    }
+}

@@ -1,0 +1,8 @@
+{
+    "bundles": {
+        "Dmstr\\Flowable\\FlowableBundle": ["all"]
+    },
+    "copy-from-recipe": {
+        "docker/": "docker/"
+    }
+}
