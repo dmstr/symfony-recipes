@@ -5,7 +5,7 @@
         ]
     },
     "branch": "flex/main",
-    "is_contrib": true,
+    "is_contrib": false,
     "_links": {
         "repository": "github.com/dmstr/symfony-recipes",
         "origin_template": "{package}:{version}@github.com/dmstr/symfony-recipes:flex/main",
